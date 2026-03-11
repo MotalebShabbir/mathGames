@@ -1,91 +1,1078 @@
-<!doctype html>
-<html lang="en">
-	<head>
-		<meta charset="UTF-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<link rel="stylesheet" href="css/index.css" />
-		<title>Math Game</title>
-	</head>
-	<body>
-		<div class="menuContainer">
-			<h1>Math Games</h1>
-			<button class="menuButton" onclick="menu(0)">Term</button>
-			<div class="termForm form">
-				<span onclick="setup(0, 2)">2</span>
-				<span onclick="setup(0, 3)">3</span>
-				<span onclick="setup(0, 4)">4</span>
-			</div>
-			<button class="menuButton" onclick="menu(1)">Range</button>
-			<div class="rangeForm form">
-				<input
-					type="range"
-					min="5"
-					max="100"
-					value="10"
-					id="rangeSlider"
-					oninput="rangeAct()" />
-				<span id="rangeValue">10</span>
-				<span onclick="setup(1, 10)">ok</span>
-			</div>
-			<button class="menuButton" onclick="menu(2)">Operator</button>
-			<div class="operatorForm form">
-				<span onclick="setup(2,0)">+</span>
-				<span onclick="setup(2,1)">-</span>
-				<span onclick="setup(2,2)">×</span>
-				<span onclick="setup(2,3)">÷</span>
-			</div>
-			<button class="menuButton" onclick="menu(3)">Round</button>
-			<div class="roundForm form">
-				<span onclick="setup(3,5)">5</span>
-				<span onclick="setup(3,10)">10</span>
-				<span onclick="setup(3,15)">15</span>
-				<span onclick="setup(3,20)">20</span>
-			</div>
-			<br />
-			<button class="menuButton" onclick="play()">Play</button>
-			<div class="error form">Setup First</div>
-		</div>
-		<div class="boardContainer">
-			<div class="header">
-				<span onclick="home()">
-					<img src="https://cdn-icons-png.flaticon.com/512/25/25694.png" />
-				</span>
-				<span>
-					<img src="https://cdn-icons-png.flaticon.com/512/571/571736.png" />
-				</span>
-			</div>
-			<div class="expression">Expression</div>
-			<div class="result">
-				<div class="feedBack"></div>
-				<!-- countdown svg -->
-				<div class="timer-wrapper">
-					<div class="timer">
-						<span id="time">Start</span>
-						<svg class="progress-ring" width="120" height="120">
-							<circle class="progress-ring__circle" cx="60" cy="60" r="54" />
-						</svg>
-					</div>
-				</div>
-			</div>
-			<div class="inputSection">
-				<input class="input" type="number" placeholder="Answer" disabled />
-				<img
-					onclick="keypress('×')"
-					src="https://cdn-icons-png.flaticon.com/512/4209/4209885.png" />
-				<input onclick="keypress('>')" type="submit" class="enter" />
-				<button onclick="play()" class="next">Next</button>
-				<button onclick="keypress(1)">1</button>
-				<button onclick="keypress(2)">2</button>
-				<button onclick="keypress(3)">3</button>
-				<button onclick="keypress(4)">4</button>
-				<button onclick="keypress(5)">5</button>
-				<button onclick="keypress(6)">6</button>
-				<button onclick="keypress(7)">7</button>
-				<button onclick="keypress(8)">8</button>
-				<button onclick="keypress(9)">9</button>
-				<button onclick="keypress(0)">0</button>
-			</div>
-		</div>
-		<script src="js/index.js"></script>
-	</body>
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jibika — জীবিকা</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0a0a0f;
+    --surface: #12121a;
+    --card: #1a1a26;
+    --border: #2a2a3a;
+    --accent: #c8a96e;
+    --accent2: #7b6ef6;
+    --accent3: #4ecdc4;
+    --accent4: #ff6b6b;
+    --accent5: #a8e6a3;
+    --text: #e8e8f0;
+    --muted: #888899;
+    --glow: rgba(200, 169, 110, 0.15);
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    overflow-x: hidden;
+    cursor: default;
+  }
+
+  /* ── NOISE TEXTURE ── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 9999;
+    opacity: 0.4;
+  }
+
+  /* ── HERO ── */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    padding: 4rem 2rem;
+    text-align: center;
+    overflow: hidden;
+  }
+
+  .hero-bg {
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 80% 60% at 50% -10%, rgba(200,169,110,0.12) 0%, transparent 60%),
+      radial-gradient(ellipse 40% 40% at 80% 80%, rgba(123,110,246,0.08) 0%, transparent 50%),
+      radial-gradient(ellipse 30% 30% at 10% 60%, rgba(78,205,196,0.06) 0%, transparent 50%);
+  }
+
+  .hero-grid {
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(200,169,110,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(200,169,110,0.04) 1px, transparent 1px);
+    background-size: 60px 60px;
+    mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 20%, transparent 80%);
+  }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(200,169,110,0.1);
+    border: 1px solid rgba(200,169,110,0.3);
+    padding: 6px 16px;
+    border-radius: 100px;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--accent);
+    letter-spacing: 0.1em;
+    margin-bottom: 2.5rem;
+    animation: fadeDown 0.8s ease both;
+  }
+
+  .badge::before {
+    content: '';
+    width: 6px; height: 6px;
+    background: var(--accent);
+    border-radius: 50%;
+    animation: pulse 2s ease infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(0.8); }
+  }
+
+  .hero-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(5rem, 14vw, 11rem);
+    font-weight: 900;
+    line-height: 0.9;
+    letter-spacing: -0.03em;
+    background: linear-gradient(135deg, #e8d5a3 0%, var(--accent) 40%, #f0c070 70%, #c8a96e 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: fadeUp 1s ease 0.2s both;
+    position: relative;
+    z-index: 1;
+  }
+
+  .hero-subtitle-bn {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.2rem, 3vw, 1.8rem);
+    color: var(--muted);
+    font-style: italic;
+    margin-top: 0.5rem;
+    animation: fadeUp 1s ease 0.35s both;
+  }
+
+  .hero-desc {
+    max-width: 520px;
+    font-size: 1.05rem;
+    color: var(--muted);
+    line-height: 1.7;
+    margin-top: 2rem;
+    animation: fadeUp 1s ease 0.5s both;
+  }
+
+  .hero-cta {
+    display: flex;
+    gap: 1rem;
+    margin-top: 3rem;
+    flex-wrap: wrap;
+    justify-content: center;
+    animation: fadeUp 1s ease 0.65s both;
+  }
+
+  .btn-primary {
+    background: var(--accent);
+    color: #0a0a0f;
+    padding: 14px 32px;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    letter-spacing: 0.02em;
+  }
+  .btn-primary:hover { background: #e0c07e; transform: translateY(-2px); box-shadow: 0 12px 40px rgba(200,169,110,0.3); }
+
+  .btn-ghost {
+    background: transparent;
+    color: var(--text);
+    padding: 14px 32px;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  .btn-ghost:hover { border-color: var(--accent); color: var(--accent); transform: translateY(-2px); }
+
+  /* ── MODULES SECTION ── */
+  .section {
+    padding: 8rem 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .section-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--accent);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+  }
+
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2.2rem, 5vw, 3.5rem);
+    font-weight: 700;
+    line-height: 1.1;
+    margin-bottom: 1.5rem;
+  }
+
+  .section-desc {
+    color: var(--muted);
+    font-size: 1.05rem;
+    max-width: 500px;
+    line-height: 1.7;
+    margin-bottom: 4rem;
+  }
+
+  /* ── MODULE CARDS ── */
+  .modules-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .module-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 2rem;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    cursor: pointer;
+    animation: fadeUp 0.8s ease both;
+  }
+
+  .module-card:nth-child(1) { animation-delay: 0.1s; }
+  .module-card:nth-child(2) { animation-delay: 0.2s; }
+  .module-card:nth-child(3) { animation-delay: 0.3s; }
+  .module-card:nth-child(4) { animation-delay: 0.4s; }
+  .module-card:nth-child(5) { animation-delay: 0.5s; }
+  .module-card:nth-child(6) { animation-delay: 0.6s; }
+
+  .module-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    border-radius: 16px;
+  }
+
+  .module-card:hover { transform: translateY(-8px); border-color: transparent; }
+  .module-card:hover::before { opacity: 1; }
+
+  .card-dashboard::before { background: linear-gradient(135deg, rgba(200,169,110,0.08), transparent); border: 1px solid rgba(200,169,110,0.3); }
+  .card-expense::before { background: linear-gradient(135deg, rgba(168,230,163,0.08), transparent); border: 1px solid rgba(168,230,163,0.3); }
+  .card-task::before { background: linear-gradient(135deg, rgba(123,110,246,0.08), transparent); border: 1px solid rgba(123,110,246,0.3); }
+  .card-journal::before { background: linear-gradient(135deg, rgba(255,107,107,0.08), transparent); border: 1px solid rgba(255,107,107,0.3); }
+  .card-habit::before { background: linear-gradient(135deg, rgba(78,205,196,0.08), transparent); border: 1px solid rgba(78,205,196,0.3); }
+  .card-timer::before { background: linear-gradient(135deg, rgba(255,180,100,0.08), transparent); border: 1px solid rgba(255,180,100,0.3); }
+
+  .module-icon {
+    width: 52px; height: 52px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+    position: relative;
+    z-index: 1;
+  }
+
+  .icon-dashboard { background: rgba(200,169,110,0.15); }
+  .icon-expense { background: rgba(168,230,163,0.15); }
+  .icon-task { background: rgba(123,110,246,0.15); }
+  .icon-journal { background: rgba(255,107,107,0.15); }
+  .icon-habit { background: rgba(78,205,196,0.15); }
+  .icon-timer { background: rgba(255,180,100,0.15); }
+
+  .module-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    position: relative;
+    z-index: 1;
+  }
+
+  .module-bn {
+    font-size: 0.8rem;
+    color: var(--muted);
+    font-style: italic;
+    margin-bottom: 1rem;
+    position: relative;
+    z-index: 1;
+  }
+
+  .module-desc {
+    color: var(--muted);
+    font-size: 0.9rem;
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
+    position: relative;
+    z-index: 1;
+  }
+
+  .module-features {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    position: relative;
+    z-index: 1;
+  }
+
+  .feature-tag {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.68rem;
+    padding: 4px 10px;
+    border-radius: 100px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    letter-spacing: 0.05em;
+  }
+
+  /* ── DASHBOARD PREVIEW ── */
+  .preview-section {
+    padding: 4rem 2rem 8rem;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .dashboard-mockup {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 40px 120px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.03);
+    position: relative;
+  }
+
+  .mockup-bar {
+    background: var(--card);
+    border-bottom: 1px solid var(--border);
+    padding: 14px 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .dot { width: 12px; height: 12px; border-radius: 50%; }
+  .dot-r { background: #ff5f57; }
+  .dot-y { background: #ffbd2e; }
+  .dot-g { background: #28c840; }
+
+  .mockup-url {
+    margin-left: 16px;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--muted);
+    background: var(--bg);
+    padding: 5px 14px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+  }
+
+  .mockup-body {
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    min-height: 520px;
+  }
+
+  .sidebar {
+    background: var(--card);
+    border-right: 1px solid var(--border);
+    padding: 1.5rem 1rem;
+  }
+
+  .sidebar-logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--accent);
+    padding: 0.5rem 0.8rem 1.5rem;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 1rem;
+  }
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    color: var(--muted);
+    margin-bottom: 4px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .nav-item:hover, .nav-item.active {
+    background: rgba(200,169,110,0.1);
+    color: var(--accent);
+  }
+
+  .nav-item.active { border-left: 2px solid var(--accent); }
+
+  .main-content {
+    padding: 2rem;
+    overflow: hidden;
+  }
+
+  .dash-greeting {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.6rem;
+    font-weight: 700;
+    margin-bottom: 0.3rem;
+  }
+
+  .dash-date {
+    font-size: 0.82rem;
+    color: var(--muted);
+    font-family: 'Space Mono', monospace;
+    margin-bottom: 2rem;
+  }
+
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .stat-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.2rem;
+  }
+
+  .stat-label {
+    font-size: 0.72rem;
+    color: var(--muted);
+    font-family: 'Space Mono', monospace;
+    margin-bottom: 0.5rem;
+    letter-spacing: 0.05em;
+  }
+
+  .stat-value {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.6rem;
+    font-weight: 700;
+  }
+
+  .stat-change {
+    font-size: 0.72rem;
+    margin-top: 4px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .up { color: var(--accent5); }
+  .down { color: var(--accent4); }
+
+  .bottom-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+
+  .mini-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.2rem;
+  }
+
+  .mini-title {
+    font-size: 0.78rem;
+    color: var(--muted);
+    font-family: 'Space Mono', monospace;
+    margin-bottom: 1rem;
+    letter-spacing: 0.05em;
+  }
+
+  .task-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    font-size: 0.82rem;
+  }
+
+  .task-check {
+    width: 16px; height: 16px;
+    border-radius: 4px;
+    border: 1.5px solid var(--border);
+    flex-shrink: 0;
+  }
+  .task-check.done {
+    background: var(--accent5);
+    border-color: var(--accent5);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.6rem; color: #0a0a0f;
+  }
+
+  .habit-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 6px 0;
+    font-size: 0.82rem;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+  }
+
+  .streak {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--accent);
+  }
+
+  .habit-dots {
+    display: flex;
+    gap: 3px;
+  }
+
+  .hdot {
+    width: 8px; height: 8px;
+    border-radius: 2px;
+    background: var(--border);
+  }
+  .hdot.done { background: var(--accent3); }
+
+  /* bar chart */
+  .bar-chart {
+    display: flex;
+    align-items: flex-end;
+    gap: 6px;
+    height: 80px;
+    margin-top: 0.5rem;
+  }
+  .bar-wrap { display: flex; flex-direction: column; align-items: center; gap: 4px; flex: 1; }
+  .bar {
+    width: 100%;
+    border-radius: 4px 4px 0 0;
+    transition: height 0.6s ease;
+  }
+  .bar-label { font-size: 0.6rem; color: var(--muted); font-family: 'Space Mono', monospace; }
+
+  /* ── TECH STACK ── */
+  .tech-section {
+    padding: 6rem 2rem;
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .tech-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 5rem;
+    align-items: center;
+  }
+
+  .tech-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-top: 2rem;
+  }
+
+  .tech-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem 1.5rem;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    transition: all 0.3s ease;
+  }
+  .tech-item:hover { border-color: var(--accent); transform: translateX(6px); }
+
+  .tech-letter {
+    width: 44px; height: 44px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Space Mono', monospace;
+    font-weight: 700;
+    font-size: 1rem;
+    flex-shrink: 0;
+  }
+
+  .tech-name { font-weight: 600; font-size: 0.95rem; }
+  .tech-role { font-size: 0.78rem; color: var(--muted); margin-top: 2px; }
+
+  /* ── ROADMAP ── */
+  .roadmap-section {
+    padding: 8rem 2rem;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  .timeline {
+    position: relative;
+    padding-left: 3rem;
+    margin-top: 3rem;
+  }
+
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 16px;
+    top: 0; bottom: 0;
+    width: 1px;
+    background: linear-gradient(to bottom, var(--accent), var(--accent2), transparent);
+  }
+
+  .phase {
+    position: relative;
+    margin-bottom: 3rem;
+    animation: fadeLeft 0.8s ease both;
+  }
+
+  .phase:nth-child(1) { animation-delay: 0.1s; }
+  .phase:nth-child(2) { animation-delay: 0.25s; }
+  .phase:nth-child(3) { animation-delay: 0.4s; }
+  .phase:nth-child(4) { animation-delay: 0.55s; }
+
+  .phase-dot {
+    position: absolute;
+    left: -2.5rem;
+    top: 0.3rem;
+    width: 20px; height: 20px;
+    border-radius: 50%;
+    border: 2px solid var(--accent);
+    background: var(--bg);
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  .phase-dot::after {
+    content: '';
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--accent);
+  }
+
+  .phase-num {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.68rem;
+    color: var(--accent);
+    letter-spacing: 0.1em;
+    margin-bottom: 0.4rem;
+  }
+
+  .phase-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.3rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+  }
+
+  .phase-items {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 0.8rem;
+  }
+
+  .phase-tag {
+    font-size: 0.78rem;
+    padding: 5px 12px;
+    border-radius: 100px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border);
+    color: var(--muted);
+  }
+
+  /* ── FOOTER ── */
+  .footer {
+    border-top: 1px solid var(--border);
+    padding: 3rem 2rem;
+    text-align: center;
+    color: var(--muted);
+    font-size: 0.85rem;
+    font-family: 'Space Mono', monospace;
+  }
+
+  .footer span { color: var(--accent); }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeDown {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeLeft {
+    from { opacity: 0; transform: translateX(-20px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+
+  /* ── DIVIDER ── */
+  .ornament {
+    text-align: center;
+    padding: 2rem 0;
+    color: var(--border);
+    font-size: 1.2rem;
+    letter-spacing: 1rem;
+  }
+
+  @media (max-width: 768px) {
+    .mockup-body { grid-template-columns: 1fr; }
+    .sidebar { display: none; }
+    .stats-row { grid-template-columns: 1fr 1fr; }
+    .bottom-row { grid-template-columns: 1fr; }
+    .tech-inner { grid-template-columns: 1fr; gap: 2rem; }
+    .modules-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ── HERO ── -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-grid"></div>
+
+  <div class="badge">MERN STACK APP &nbsp;·&nbsp; PERSONAL PROJECT</div>
+
+  <h1 class="hero-title">Jibika</h1>
+  <p class="hero-subtitle-bn">জীবিকা — আপনার জীবন, আপনার নিয়ন্ত্রণে</p>
+
+  <p class="hero-desc">
+    একটিমাত্র app-এ আপনার সম্পূর্ণ জীবন পরিচালনা করুন।
+    Expense থেকে Habit, Task থেকে Journal — সব এক ছাদের নিচে।
+  </p>
+
+  <div class="hero-cta">
+    <button class="btn-primary" onclick="document.getElementById('modules').scrollIntoView({behavior:'smooth'})">Modules দেখুন</button>
+    <button class="btn-ghost" onclick="document.getElementById('roadmap').scrollIntoView({behavior:'smooth'})">Roadmap →</button>
+  </div>
+</section>
+
+<!-- ── MODULES ── -->
+<section class="section" id="modules">
+  <div class="section-label">// 06 MODULES</div>
+  <h2 class="section-title">সব কিছু এক জায়গায়</h2>
+  <p class="section-desc">প্রতিটি module আলাদাভাবে কাজ করে, কিন্তু একসাথে আপনার পুরো জীবনের ছবি তৈরি করে।</p>
+
+  <div class="modules-grid">
+    <div class="module-card card-dashboard">
+      <div class="module-icon icon-dashboard">🏠</div>
+      <div class="module-name">Dashboard</div>
+      <div class="module-bn">ড্যাশবোর্ড</div>
+      <p class="module-desc">সব module-এর summary একনজরে। আজকের task, খরচ, habit streak এবং mood — সব এক স্ক্রিনে।</p>
+      <div class="module-features">
+        <span class="feature-tag">Daily Summary</span>
+        <span class="feature-tag">Quick Stats</span>
+        <span class="feature-tag">Widgets</span>
+      </div>
+    </div>
+
+    <div class="module-card card-expense">
+      <div class="module-icon icon-expense">💰</div>
+      <div class="module-name">Expense Tracker</div>
+      <div class="module-bn">আয়-ব্যয় হিসাব</div>
+      <p class="module-desc">প্রতিদিনের আয় ও ব্যয় track করুন। Category অনুযায়ী breakdown এবং monthly chart দেখুন।</p>
+      <div class="module-features">
+        <span class="feature-tag">Income/Expense</span>
+        <span class="feature-tag">Category Filter</span>
+        <span class="feature-tag">Monthly Chart</span>
+        <span class="feature-tag">Budget Alert</span>
+      </div>
+    </div>
+
+    <div class="module-card card-task">
+      <div class="module-icon icon-task">✅</div>
+      <div class="module-name">Task Manager</div>
+      <div class="module-bn">কাজের তালিকা</div>
+      <p class="module-desc">To-do list বানান, deadline set করুন এবং priority অনুযায়ী সাজান। কাজ শেষে tick করুন।</p>
+      <div class="module-features">
+        <span class="feature-tag">Priority Levels</span>
+        <span class="feature-tag">Deadline</span>
+        <span class="feature-tag">Categories</span>
+        <span class="feature-tag">Progress</span>
+      </div>
+    </div>
+
+    <div class="module-card card-journal">
+      <div class="module-icon icon-journal">📔</div>
+      <div class="module-name">Daily Journal</div>
+      <div class="module-bn">রোজনামচা</div>
+      <p class="module-desc">প্রতিদিনের অনুভূতি ও চিন্তা লিখে রাখুন। Mood tracking করুন এবং পুরনো entries পড়ুন।</p>
+      <div class="module-features">
+        <span class="feature-tag">Mood Tracker</span>
+        <span class="feature-tag">Rich Text</span>
+        <span class="feature-tag">Calendar View</span>
+        <span class="feature-tag">Private</span>
+      </div>
+    </div>
+
+    <div class="module-card card-habit">
+      <div class="module-icon icon-habit">🎯</div>
+      <div class="module-name">Habit Tracker</div>
+      <div class="module-bn">অভ্যাস গঠন</div>
+      <p class="module-desc">ভালো অভ্যাস তৈরি করুন। প্রতিদিন check করুন এবং streak বজায় রাখুন। গ্রাফে progress দেখুন।</p>
+      <div class="module-features">
+        <span class="feature-tag">Daily Streak</span>
+        <span class="feature-tag">Heatmap</span>
+        <span class="feature-tag">Reminders</span>
+        <span class="feature-tag">Statistics</span>
+      </div>
+    </div>
+
+    <div class="module-card card-timer">
+      <div class="module-icon icon-timer">⏱️</div>
+      <div class="module-name">Focus Timer</div>
+      <div class="module-bn">মনোযোগ টাইমার</div>
+      <p class="module-desc">Pomodoro technique ব্যবহার করে মনোযোগ দিয়ে কাজ করুন। Session history দেখুন।</p>
+      <div class="module-features">
+        <span class="feature-tag">Pomodoro</span>
+        <span class="feature-tag">Custom Timer</span>
+        <span class="feature-tag">Session Log</span>
+        <span class="feature-tag">Sound Alert</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── DASHBOARD MOCKUP ── -->
+<section class="preview-section" id="preview">
+  <div class="section-label">// UI PREVIEW</div>
+  <h2 class="section-title" style="margin-bottom:2.5rem">Dashboard এর প্রিভিউ</h2>
+
+  <div class="dashboard-mockup">
+    <div class="mockup-bar">
+      <div class="dot dot-r"></div>
+      <div class="dot dot-y"></div>
+      <div class="dot dot-g"></div>
+      <div class="mockup-url">localhost:3000/dashboard</div>
+    </div>
+
+    <div class="mockup-body">
+      <!-- Sidebar -->
+      <div class="sidebar">
+        <div class="sidebar-logo">✦ Jibika</div>
+        <div class="nav-item active">🏠 &nbsp;Dashboard</div>
+        <div class="nav-item">💰 &nbsp;Expense</div>
+        <div class="nav-item">✅ &nbsp;Tasks</div>
+        <div class="nav-item">📔 &nbsp;Journal</div>
+        <div class="nav-item">🎯 &nbsp;Habits</div>
+        <div class="nav-item">⏱️ &nbsp;Focus</div>
+        <div style="margin-top:auto; padding-top:2rem;">
+          <div class="nav-item">⚙️ &nbsp;Settings</div>
+        </div>
+      </div>
+
+      <!-- Main -->
+      <div class="main-content">
+        <div class="dash-greeting">Good morning, Rafsan 👋</div>
+        <div class="dash-date">WEDNESDAY · MARCH 11, 2026</div>
+
+        <div class="stats-row">
+          <div class="stat-card">
+            <div class="stat-label">THIS MONTH</div>
+            <div class="stat-value" style="color:var(--accent5)">৳18,450</div>
+            <div class="stat-change up">↑ Income</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">EXPENSES</div>
+            <div class="stat-value" style="color:var(--accent4)">৳9,200</div>
+            <div class="stat-change down">↓ 12% this week</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">TASKS TODAY</div>
+            <div class="stat-value" style="color:var(--accent2)">4/7</div>
+            <div class="stat-change" style="color:var(--muted)">3 remaining</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">HABIT STREAK</div>
+            <div class="stat-value" style="color:var(--accent3)">🔥 14</div>
+            <div class="stat-change up">Days in a row</div>
+          </div>
+        </div>
+
+        <div class="bottom-row">
+          <!-- Tasks -->
+          <div class="mini-card">
+            <div class="mini-title">TODAY'S TASKS</div>
+            <div class="task-item">
+              <div class="task-check done">✓</div>
+              <span style="text-decoration:line-through;color:var(--muted)">Morning exercise</span>
+            </div>
+            <div class="task-item">
+              <div class="task-check done">✓</div>
+              <span style="text-decoration:line-through;color:var(--muted)">Read for 30 mins</span>
+            </div>
+            <div class="task-item">
+              <div class="task-check"></div>
+              <span>Finish MERN project</span>
+              <span style="margin-left:auto;font-size:0.68rem;color:var(--accent4)">HIGH</span>
+            </div>
+            <div class="task-item">
+              <div class="task-check"></div>
+              <span>Call family</span>
+            </div>
+          </div>
+
+          <!-- Habits -->
+          <div class="mini-card">
+            <div class="mini-title">HABIT TRACKER · THIS WEEK</div>
+            <div class="habit-row">
+              <span>🏃 Morning Run</span>
+              <div class="habit-dots">
+                <div class="hdot done"></div><div class="hdot done"></div>
+                <div class="hdot done"></div><div class="hdot done"></div>
+                <div class="hdot done"></div><div class="hdot"></div><div class="hdot"></div>
+              </div>
+              <span class="streak">🔥14</span>
+            </div>
+            <div class="habit-row">
+              <span>📚 Reading</span>
+              <div class="habit-dots">
+                <div class="hdot done"></div><div class="hdot done"></div>
+                <div class="hdot"></div><div class="hdot done"></div>
+                <div class="hdot done"></div><div class="hdot"></div><div class="hdot"></div>
+              </div>
+              <span class="streak">🔥8</span>
+            </div>
+            <div class="habit-row">
+              <span>💧 Water</span>
+              <div class="habit-dots">
+                <div class="hdot done"></div><div class="hdot done"></div>
+                <div class="hdot done"></div><div class="hdot done"></div>
+                <div class="hdot done"></div><div class="hdot done"></div><div class="hdot"></div>
+              </div>
+              <span class="streak">🔥21</span>
+            </div>
+            <div class="habit-row">
+              <span>🧘 Meditation</span>
+              <div class="habit-dots">
+                <div class="hdot done"></div><div class="hdot"></div>
+                <div class="hdot done"></div><div class="hdot done"></div>
+                <div class="hdot"></div><div class="hdot"></div><div class="hdot"></div>
+              </div>
+              <span class="streak">🔥5</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── TECH STACK ── -->
+<section class="tech-section">
+  <div class="tech-inner">
+    <div>
+      <div class="section-label">// TECH STACK</div>
+      <h2 class="section-title">MERN দিয়ে<br>বানানো হবে</h2>
+      <p class="section-desc" style="margin-bottom:0">প্রতিটি layer-এ MERN stack-এর সম্পূর্ণ ব্যবহার হবে। এই একটা project করলেই MERN পুরোপুরি শেখা হবে।</p>
+    </div>
+
+    <div class="tech-stack">
+      <div class="tech-item">
+        <div class="tech-letter" style="background:rgba(104,160,99,0.15);color:#68a063">M</div>
+        <div>
+          <div class="tech-name">MongoDB</div>
+          <div class="tech-role">Database — সব data store করবে</div>
+        </div>
+      </div>
+      <div class="tech-item">
+        <div class="tech-letter" style="background:rgba(255,255,255,0.05);color:#ddd">E</div>
+        <div>
+          <div class="tech-name">Express.js</div>
+          <div class="tech-role">Backend — REST API তৈরি করবে</div>
+        </div>
+      </div>
+      <div class="tech-item">
+        <div class="tech-letter" style="background:rgba(97,219,251,0.12);color:#61dbfb">R</div>
+        <div>
+          <div class="tech-name">React.js</div>
+          <div class="tech-role">Frontend — সুন্দর UI তৈরি করবে</div>
+        </div>
+      </div>
+      <div class="tech-item">
+        <div class="tech-letter" style="background:rgba(104,160,99,0.15);color:#68a063">N</div>
+        <div>
+          <div class="tech-name">Node.js</div>
+          <div class="tech-role">Server — সব কিছু চালাবে</div>
+        </div>
+      </div>
+      <div class="tech-item">
+        <div class="tech-letter" style="background:rgba(200,169,110,0.12);color:var(--accent)">+</div>
+        <div>
+          <div class="tech-name">JWT + Recharts</div>
+          <div class="tech-role">Authentication + Beautiful Charts</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── ROADMAP ── -->
+<section class="roadmap-section" id="roadmap">
+  <div class="section-label">// DEVELOPMENT PLAN</div>
+  <h2 class="section-title">কিভাবে বানাবেন</h2>
+  <p class="section-desc">একসাথে সব না বানিয়ে phase-by-phase এগোন।</p>
+
+  <div class="timeline">
+    <div class="phase">
+      <div class="phase-dot"></div>
+      <div class="phase-num">PHASE 01 — FOUNDATION</div>
+      <div class="phase-title">Project Setup + Authentication</div>
+      <p style="color:var(--muted);font-size:0.88rem;line-height:1.6">Node/Express server, MongoDB connection, JWT login/register, React project setup, protected routes।</p>
+      <div class="phase-items">
+        <span class="phase-tag">Node.js Setup</span>
+        <span class="phase-tag">MongoDB Connect</span>
+        <span class="phase-tag">JWT Auth</span>
+        <span class="phase-tag">React Router</span>
+        <span class="phase-tag">Login/Register UI</span>
+      </div>
+    </div>
+
+    <div class="phase">
+      <div class="phase-dot"></div>
+      <div class="phase-num">PHASE 02 — CORE MODULE</div>
+      <div class="phase-title">Expense Tracker</div>
+      <p style="color:var(--muted);font-size:0.88rem;line-height:1.6">CRUD operations, category management, Recharts দিয়ে monthly chart। MERN-এর পুরো cycle এখানেই শেখা হবে।</p>
+      <div class="phase-items">
+        <span class="phase-tag">CRUD API</span>
+        <span class="phase-tag">Mongoose Schema</span>
+        <span class="phase-tag">Form UI</span>
+        <span class="phase-tag">Recharts</span>
+        <span class="phase-tag">Filter/Search</span>
+      </div>
+    </div>
+
+    <div class="phase">
+      <div class="phase-dot"></div>
+      <div class="phase-num">PHASE 03 — PRODUCTIVITY</div>
+      <div class="phase-title">Task Manager + Habit Tracker</div>
+      <p style="color:var(--muted);font-size:0.88rem;line-height:1.6">Task CRUD with priority/deadline, habit daily check-in, streak calculation, heatmap visualization।</p>
+      <div class="phase-items">
+        <span class="phase-tag">Task CRUD</span>
+        <span class="phase-tag">Priority System</span>
+        <span class="phase-tag">Habit Check-in</span>
+        <span class="phase-tag">Streak Logic</span>
+        <span class="phase-tag">Heatmap</span>
+      </div>
+    </div>
+
+    <div class="phase">
+      <div class="phase-dot"></div>
+      <div class="phase-num">PHASE 04 — PERSONAL</div>
+      <div class="phase-title">Journal + Focus Timer + Dashboard</div>
+      <p style="color:var(--muted);font-size:0.88rem;line-height:1.6">Rich text journal, mood tracking, Pomodoro timer, সব module-এর data একসাথে dashboard-এ দেখানো।</p>
+      <div class="phase-items">
+        <span class="phase-tag">Rich Text Editor</span>
+        <span class="phase-tag">Mood System</span>
+        <span class="phase-tag">Pomodoro Timer</span>
+        <span class="phase-tag">Dashboard Widgets</span>
+        <span class="phase-tag">Final Polish</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── FOOTER ── -->
+<footer class="footer">
+  <div>✦ &nbsp;<span>Jibika</span> &nbsp;·&nbsp; জীবিকা &nbsp;·&nbsp; Built with MERN Stack</div>
+  <div style="margin-top:0.8rem;font-size:0.72rem">আপনার জীবন, আপনার app, আপনার নিয়ন্ত্রণে।</div>
+</footer>
+
+</body>
 </html>
